@@ -7,13 +7,22 @@ sig
 
   val insert    : Elem * Set -> Set
   val insert'   : Elem * Set -> Set
-  (* val insert''  : Elem * Set -> Set *)
 
   val member    : Elem * Set -> bool
   val member'   : Elem * Set -> bool
 
   val complete  : Elem * int -> Set
   val complete' : Elem * int -> Set
+end
+
+signature FiniteMap =
+sig
+  type Key
+  type 'a Map
+
+  val empty  : 'a Map
+  val bind   : Key * 'a * 'a Map -> 'a Map
+  val lookup : Key * 'a Map -> 'a
 end
 
 signature Ordered =
@@ -38,7 +47,24 @@ struct
   fun leq (x, y) = x <= y
 end
 
-functor UnbalancedSet (Element: Ordered): Set =
+functor OrderedPair (structure Key: Ordered
+                     structure Value: Ordered): Ordered =
+struct
+  type T = Key.T * Value.T
+
+  val min = (Key.min, Value.min)
+
+  fun eq  ((k1, _), (k2, _)) = Key.eq  (k1, k2)
+  fun lt  ((k1, _), (k2, _)) = Key.lt  (k1, k2)
+  fun leq ((k1, _), (k2, _)) = Key.leq (k1, k2)
+end
+
+(* functor MkFiniteMap (Element: Ordered): FiniteMap = *)
+(* struct *)
+(*   type 'a Map = MkUnbalancedSet('a) *)
+(* end *)
+
+functor MkUnbalancedSet (Element: Ordered): Set =
 struct
   type Elem = Element.T
 
@@ -80,13 +106,15 @@ struct
             else raise SAMEVALUE
     in ins s handle SAMEVALUE => s end
 
-  fun complete' (x, 0) = raise Empty
-    | complete' (x, 1) = T (E, x, E)
-    | complete' (x, d) = T (complete' (x, d - 1), x, E)
-
+  (* Ex. 2.5 a) *)
   fun complete (x, 0) = T (E, x, T (E, x, E))
     | complete (x, 1) = T (T (E, x, E), x, complete (x, 0))
     | complete (x, m) = T (complete (x, m - 2), x, complete (x, m - 1))
+
+  (* Ex. 2.5 b) *)
+  fun complete' (x, 0) = raise Empty
+    | complete' (x, 1) = T (E, x, E)
+    | complete' (x, d) = T (complete' (x, d - 1), x, E)
 end
 
-structure IntUS = UnbalancedSet(OrderedInt);
+structure IntUS = MkUnbalancedSet(OrderedInt);
