@@ -47,7 +47,7 @@ struct
   fun leq (x, y) = x <= y
 end
 
-functor OrderedPair (structure Key: Ordered
+functor MkOrderedPair (structure Key: Ordered
                      structure Value: Ordered): Ordered =
 struct
   type T = Key.T * Value.T
