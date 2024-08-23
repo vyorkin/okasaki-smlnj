@@ -3,8 +3,6 @@
 (* Heap = Priority queue *)
 (* Supports efficient access only to the minimum element *)
 
-(* Visualization: https://www.cs.usfca.edu/~galles/visualization/LeftistHeap.html *)
-
 (* https://www.youtube.com/watch?v=y2mipTl823k
    https://www.youtube.com/watch?v=ktes_kHGG2Q *)
 
